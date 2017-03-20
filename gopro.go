@@ -48,6 +48,8 @@ func CreateGoPro(Ipaddr string, auth ...interface{}) *GoPro {
 
 	if len(auth) == 1 {
 		gopro.APIRequester.BasicAuth = &BasicAuth{Password: auth[0].(string)}
+	} else {
+		gopro.APIRequester.BasicAuth = &BasicAuth{Password: ""}
 	}
 	return gopro
 }

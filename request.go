@@ -12,7 +12,7 @@ type APIRequester struct {
 }
 
 func (ar *APIRequester) doRequest(Method string, RequestURL string) (*http.Response, error) {
-	req, err := http.NewRequest(Method, RequestURL, nil)
+	req, err := http.NewRequest(Method, RequestURL+fmt.Sprintf("t=%s", ar.BasicAuth.Password), nil)
 	if err != nil {
 		return nil, err
 	}
