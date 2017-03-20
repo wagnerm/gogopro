@@ -1,8 +1,8 @@
 package gopro
 
 import (
-	"fmt"
 	"net/http"
+	"strconv"
 )
 
 type APIRequester struct {
@@ -11,8 +11,8 @@ type APIRequester struct {
 	Client    *http.Client
 }
 
-func (ar *APIRequester) executeRequest(Method string, Endpoint string) (*http.Response, error) {
-	req, err := http.NewRequest(Method, ar.URL+Endpoint, nil)
+func (ar *APIRequester) doRequest(Method string, RequestURL string) (*http.Response, error) {
+	req, err := http.NewRequest(Method, RequestURL, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -22,13 +22,19 @@ func (ar *APIRequester) executeRequest(Method string, Endpoint string) (*http.Re
 		return nil, err
 	}
 
-	fmt.Println(response)
 	return response, nil
 }
 
 func (ar *APIRequester) get(Endpoint string) (*http.Response, error) {
-	// Need to do something with payload
-	resp, err := ar.executeRequest("GET", Endpoint)
+	resp, err := ar.doRequest("GET", ar.URL+Endpoint)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+func (ar *APIRequester) getWithPort(Endpoint string, Port int) (*http.Response, error) {
+	resp, err := ar.doRequest("GET", ar.URL+Endpoint+":"+strconv.Itoa(Port))
 	if err != nil {
 		return nil, err
 	}

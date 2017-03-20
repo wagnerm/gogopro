@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/wagnerm/gopro"
+	"github.com/wagnerm/gogopro"
 )
 
 func main() {
@@ -10,5 +10,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(gopro.Status())
+	status, err := gopro.Status()
+	fmt.Println(status)
 }

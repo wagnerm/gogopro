@@ -44,7 +44,7 @@ func (gopro *GoPro) initLogger() {
 
 func CreateGoPro(Ipaddr string, auth ...interface{}) *GoPro {
 	gopro := &GoPro{}
-	gopro.APIRequester = &APIRequester{URL: "http://" + Ipaddr + ":8080/"}
+	gopro.APIRequester = &APIRequester{URL: "http://" + Ipaddr}
 
 	if len(auth) == 1 {
 		gopro.APIRequester.BasicAuth = &BasicAuth{Password: auth[0].(string)}
@@ -52,8 +52,8 @@ func CreateGoPro(Ipaddr string, auth ...interface{}) *GoPro {
 	return gopro
 }
 
-func (gopro *GoPro) Status() (*http.Response, error) {
-	resp, err := gopro.APIRequester.get("")
+func (gopro *GoPro) Status() (interface{}, error) {
+	resp, err := gopro.APIRequester.getWithPort("", 8080)
 	if err != nil {
 		return nil, err
 	}
