@@ -1,4 +1,4 @@
-package gopro
+package gogopro
 
 import (
 	"strings"

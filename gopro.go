@@ -1,4 +1,4 @@
-package gopro
+package gogopro
 
 import (
 	"log"
@@ -11,7 +11,8 @@ type BasicAuth struct {
 }
 
 type GoPro struct {
-	APIRequester *APIRequester
+	Power  *Power
+	Camera *Camera
 }
 
 var (
@@ -24,7 +25,8 @@ func (gopro *GoPro) Init() (*GoPro, error) {
 	client := &http.Client{
 		CheckRedirect: nil,
 	}
-	gopro.APIRequester.Client = client
+	gopro.Power.APIRequester.Client = client
+	gopro.Camera.APIRequester.Client = client
 	return gopro, nil
 }
 
@@ -44,28 +46,19 @@ func (gopro *GoPro) initLogger() {
 
 func CreateGoPro(Ipaddr string, auth ...interface{}) *GoPro {
 	gopro := &GoPro{}
-	gopro.APIRequester = &APIRequester{URL: "http://" + Ipaddr}
+	APIRequester := &APIRequester{URL: "http://" + Ipaddr}
 
 	if len(auth) == 1 {
-		gopro.APIRequester.BasicAuth = &BasicAuth{Password: auth[0].(string)}
+		APIRequester.BasicAuth = &BasicAuth{Password: auth[0].(string)}
 	} else {
-		gopro.APIRequester.BasicAuth = &BasicAuth{Password: ""}
+		APIRequester.BasicAuth = &BasicAuth{Password: ""}
 	}
+
+	power := CreatePower(APIRequester).Init()
+	gopro.Power = power
+
+	camera := CreateCamera(APIRequester).Init()
+	gopro.Camera = camera
+
 	return gopro
-}
-
-func (gopro *GoPro) Status() (*http.Response, error) {
-	resp, err := gopro.APIRequester.getWithPort("", 8080)
-	if err != nil {
-		return nil, err
-	}
-	return resp, nil
-}
-
-func (gopro *GoPro) GetPowerStatus() (*http.Response, error) {
-	resp, err := gopro.APIRequester.get("/bacpac/se")
-	if err != nil {
-		return nil, err
-	}
-	return resp, nil
 }
