@@ -48,12 +48,22 @@ func CreateGoPro(Ipaddr string, auth ...interface{}) *GoPro {
 
 	if len(auth) == 1 {
 		gopro.APIRequester.BasicAuth = &BasicAuth{Password: auth[0].(string)}
+	} else {
+		gopro.APIRequester.BasicAuth = &BasicAuth{Password: ""}
 	}
 	return gopro
 }
 
-func (gopro *GoPro) Status() (interface{}, error) {
+func (gopro *GoPro) Status() (*http.Response, error) {
 	resp, err := gopro.APIRequester.getWithPort("", 8080)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+func (gopro *GoPro) GetPowerStatus() (*http.Response, error) {
+	resp, err := gopro.APIRequester.get("/bacpac/se")
 	if err != nil {
 		return nil, err
 	}
