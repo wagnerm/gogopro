@@ -1,6 +1,7 @@
-package gopro
+package gogopro
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 )

@@ -6,10 +6,14 @@ import (
 )
 
 func main() {
-	gopro, err := gopro.CreateGoPro("10.5.5.9").Init()
+	gopro, err := gogopro.CreateGoPro("10.5.5.9").Init()
 	if err != nil {
 		panic(err)
 	}
-	status, err := gopro.Status()
+	fmt.Println(gopro)
+	status, err := (*gopro.Power).GetPowerStatus()
+	if err != nil {
+		panic(err)
+	}
 	fmt.Println(status)
 }
