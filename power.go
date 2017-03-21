@@ -14,12 +14,12 @@ func (p *Power) Init() *Power {
 func CreatePower(APIRequester *APIRequester) *Power {
 	power := &Power{}
 	power.APIRequester = APIRequester
-	statusCommands := CreateStatusCommands()
+	statusCommands := CreatePowerStatusCommands()
 	power.StatusCommands = statusCommands
 	return power
 }
 
-func CreateStatusCommands() map[string]StatusCommand {
+func CreatePowerStatusCommands() map[string]StatusCommand {
 	sc := make(map[string]StatusCommand)
 	sc["power"] = StatusCommand{Endpoint: "/bacpac/se", ResultByte: -1,
 		Translaters: []StatusTranslater{

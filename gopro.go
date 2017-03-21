@@ -11,7 +11,8 @@ type BasicAuth struct {
 }
 
 type GoPro struct {
-	Power *Power
+	Power  *Power
+	Camera *Camera
 }
 
 var (
@@ -25,6 +26,7 @@ func (gopro *GoPro) Init() (*GoPro, error) {
 		CheckRedirect: nil,
 	}
 	gopro.Power.APIRequester.Client = client
+	gopro.Camera.APIRequester.Client = client
 	return gopro, nil
 }
 
@@ -54,6 +56,9 @@ func CreateGoPro(Ipaddr string, auth ...interface{}) *GoPro {
 
 	power := CreatePower(APIRequester).Init()
 	gopro.Power = power
+
+	camera := CreateCamera(APIRequester).Init()
+	gopro.Camera = camera
 
 	return gopro
 }

@@ -16,4 +16,10 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(status)
+
+	status, err := (*gopro.Camera).GetMode()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(status)
 }
