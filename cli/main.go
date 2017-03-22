@@ -10,16 +10,17 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(gopro)
-	status, err := (*gopro.Power).GetPowerStatus()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(status)
 
-	status, err := (*gopro.Camera).GetMode()
-	if err != nil {
-		panic(err)
+	commands := []string{"mode", "defaultmode", "spotmeter", "timelapse_interval", "fov", "photores",
+		"minselapsed", "secselapsed", "volume", "led", "recording", "videoresolution", "fps",
+		"photoremaining", "photocount", "videoremaining", "videocount"}
+	for _, c := range commands {
+		fmt.Println(c + ":")
+		status, err := (*gopro.Camera).Status(c)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("\t" + status)
 	}
-	fmt.Println(status)
+
 }
