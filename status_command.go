@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"strconv"
 )
 
 type StatusTranslater struct {
@@ -32,13 +33,15 @@ func (s StatusCommand) RunStatusCommand(APIRequester *APIRequester) (string, err
 }
 
 func (s StatusCommand) EvalTranslater(result []byte) (string, error) {
-	fmt.Println(len(result))
-	fmt.Println(result)
 	found_result := byte(0)
 	if s.ResultByte == -1 {
 		found_result = result[len(result)-1]
 	} else {
 		found_result = result[s.ResultByte]
+	}
+
+	if s.Translaters == nil {
+		return strconv.Itoa(int(found_result)), nil
 	}
 
 	for _, translater := range s.Translaters {

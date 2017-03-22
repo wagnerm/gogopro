@@ -88,9 +88,88 @@ func CreateCameraStatusCommands() map[string]StatusCommand {
 			StatusTranslater{
 				Result:         60,
 				ExpectedReturn: "60s"}}}
-	sc["iso_sharpness"] = StatusCommand{
+	sc["fov"] = StatusCommand{
 		Endpoint:   "/camera/sx",
-		ResultByte: 6,
+		ResultByte: 7,
+		Translaters: []StatusTranslater{
+			StatusTranslater{
+				Result:         0,
+				ExpectedReturn: "wide"},
+			StatusTranslater{
+				Result:         1,
+				ExpectedReturn: "medium"},
+			StatusTranslater{
+				Result:         2,
+				ExpectedReturn: "narrow"}}}
+	sc["photores"] = StatusCommand{
+		Endpoint:   "/camera/sx",
+		ResultByte: 8,
+		Translaters: []StatusTranslater{
+			StatusTranslater{
+				Result:         3,
+				ExpectedReturn: "5MP_med"},
+			StatusTranslater{
+				Result:         4,
+				ExpectedReturn: "7MP_wide"},
+			StatusTranslater{
+				Result:         8,
+				ExpectedReturn: "10MP_wide"}}}
+	sc["minselapsed"] = StatusCommand{
+		Endpoint:    "/camera/sx",
+		ResultByte:  13,
+		Translaters: nil}
+	sc["secselapsed"] = StatusCommand{
+		Endpoint:    "/camera/sx",
+		ResultByte:  14,
+		Translaters: nil}
+	sc["volume"] = StatusCommand{
+		Endpoint:   "/camera/sx",
+		ResultByte: 16,
+		Translaters: []StatusTranslater{
+			StatusTranslater{
+				Result:         0,
+				ExpectedReturn: "off"},
+			StatusTranslater{
+				Result:         1,
+				ExpectedReturn: "70%"},
+			StatusTranslater{
+				Result:         2,
+				ExpectedReturn: "100%"}}}
+	sc["led"] = StatusCommand{
+		Endpoint:   "/camera/sx",
+		ResultByte: 17,
+		Translaters: []StatusTranslater{
+			StatusTranslater{
+				Result:         0,
+				ExpectedReturn: "off"},
+			StatusTranslater{
+				Result:         1,
+				ExpectedReturn: "led2"},
+			StatusTranslater{
+				Result:         2,
+				ExpectedReturn: "led4"}}}
+
+	/* TODO: Photo/video counts for two bytes? */
+	sc["photoremaining"] = StatusCommand{
+		Endpoint:    "/camera/sx",
+		ResultByte:  21,
+		Translaters: nil}
+	sc["photocount"] = StatusCommand{
+		Endpoint:    "/camera/sx",
+		ResultByte:  23,
+		Translaters: nil}
+	sc["videoremaining"] = StatusCommand{
+		Endpoint:    "/camera/sx",
+		ResultByte:  25,
+		Translaters: nil}
+	sc["videocount"] = StatusCommand{
+		Endpoint:    "/camera/sx",
+		ResultByte:  25,
+		Translaters: nil}
+
+	sc["recording"] = StatusCommand{
+		Endpoint:   "/camera/sx",
+		ResultByte: 29,
 		Translaters: []StatusTranslater{
 			StatusTranslater{
 				Result:         0,
@@ -98,11 +177,68 @@ func CreateCameraStatusCommands() map[string]StatusCommand {
 			StatusTranslater{
 				Result:         1,
 				ExpectedReturn: "on"}}}
+	sc["videoresolution"] = StatusCommand{
+		Endpoint:   "/camera/sx",
+		ResultByte: 50,
+		Translaters: []StatusTranslater{
+			StatusTranslater{
+				Result:         0,
+				ExpectedReturn: "WVGA"},
+			StatusTranslater{
+				Result:         1,
+				ExpectedReturn: "720"},
+			StatusTranslater{
+				Result:         2,
+				ExpectedReturn: "960"},
+			StatusTranslater{
+				Result:         3,
+				ExpectedReturn: "1080"}}}
+	sc["fps"] = StatusCommand{
+		Endpoint:   "/camera/sx",
+		ResultByte: 51,
+		Translaters: []StatusTranslater{
+			StatusTranslater{
+				Result:         3,
+				ExpectedReturn: "25"},
+			StatusTranslater{
+				Result:         6,
+				ExpectedReturn: "50"}}}
+
+	/*
+		/*
+			TODO: Need support for checking bits
+			sc["orientation"] = StatusCommand{
+				Endpoint:   "/camera/sx",
+				ResultByte: 18,
+				Translaters: []StatusTranslater{
+					StatusTranslater{
+						Result:         0,
+						ExpectedReturn: "up"},
+					StatusTranslater{
+						Result:         4,
+						ExpectedReturn: "down"}}}
+			sc["iso_sharpness"] = StatusCommand{
+					Endpoint:   "/camera/sx",
+					ResultByte: 6,
+					Translaters: []StatusTranslater{
+						StatusTranslater{
+							Result:         0,
+							ExpectedReturn: "off"},
+						StatusTranslater{
+							Result:         1,
+							ExpectedReturn: "on"}}}
+
+			TODO: Byte 30
+			====
+			Protune
+			Low light
+			Color
+	*/
 	return sc
 }
 
-func (c *Camera) GetMode() (string, error) {
-	result, err := c.StatusCommands["mode"].RunStatusCommand(c.APIRequester)
+func (c *Camera) Status(Command string) (string, error) {
+	result, err := c.StatusCommands[Command].RunStatusCommand(c.APIRequester)
 	if err != nil {
 		return "", err
 	}

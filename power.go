@@ -32,8 +32,8 @@ func CreatePowerStatusCommands() map[string]StatusCommand {
 	return sc
 }
 
-func (p *Power) GetPowerStatus() (string, error) {
-	result, err := p.StatusCommands["power"].RunStatusCommand(p.APIRequester)
+func (p *Power) Status(Command string) (string, error) {
+	result, err := p.StatusCommands[Command].RunStatusCommand(p.APIRequester)
 	if err != nil {
 		return "", err
 	}
