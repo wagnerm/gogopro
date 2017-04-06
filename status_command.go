@@ -34,14 +34,8 @@ func (s StatusCommand) RunStatusCommand(APIRequester *APIRequester) (string, err
 
 func (s StatusCommand) EvalTranslater(result []byte) (string, error) {
 	found_result := byte(0)
-	if s.ResultByte == -1 {
-		found_result = result[len(result)-1]
-	} else {
+	if s.ResultByte < len(result) && s.ResultByte >= 0 {
 		found_result = result[s.ResultByte]
-	}
-
-	if s.Translaters == nil {
-		return strconv.Itoa(int(found_result)), nil
 	}
 
 	for _, translater := range s.Translaters {
