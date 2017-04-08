@@ -4,22 +4,15 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"strconv"
 )
 
-type StatusTranslater struct {
-	Result         byte
-	ExpectedReturn string
-}
-
 type StatusCommand struct {
-	Endpoint    string
 	ResultByte  int
-	Translaters []StatusTranslater
+	Translaters map[byte]string
 }
 
-func (s StatusCommand) RunStatusCommand(APIRequester *APIRequester) (string, error) {
-	resp, err := APIRequester.get(s.Endpoint)
+func (s StatusCommand) RunStatusCommand(Endpoint string, APIRequester *APIRequester) (string, error) {
+	resp, err := APIRequester.get(Endpoint)
 	if err != nil {
 		return "", err
 	}
@@ -33,15 +26,17 @@ func (s StatusCommand) RunStatusCommand(APIRequester *APIRequester) (string, err
 }
 
 func (s StatusCommand) EvalTranslater(result []byte) (string, error) {
-	found_result := byte(0)
-	if s.ResultByte < len(result) && s.ResultByte >= 0 {
-		found_result = result[s.ResultByte]
+	commandResultByte := byte(0)
+	if s.ResultByte == -1 {
+		commandResultByte = result[len(result)-1]
+	} else if s.ResultByte < len(result) && s.ResultByte >= 0 {
+		commandResultByte = result[s.ResultByte]
 	}
 
-	for _, translater := range s.Translaters {
-		if translater.Result == found_result {
-			return translater.ExpectedReturn, nil
-		}
+	v, ok := s.Translaters[commandResultByte]
+	if ok == false {
+		return v, errors.New(fmt.Sprintf("No related status for %d", commandResultByte))
 	}
-	return "", errors.New(fmt.Sprintf("Failed to find a expected return val for result %d", found_result))
+
+	return v, nil
 }

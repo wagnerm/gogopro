@@ -21,19 +21,15 @@ func CreatePower(APIRequester *APIRequester) *Power {
 
 func CreatePowerStatusCommands() map[string]StatusCommand {
 	sc := make(map[string]StatusCommand)
-	sc["power"] = StatusCommand{Endpoint: "/bacpac/se", ResultByte: -1,
-		Translaters: []StatusTranslater{
-			StatusTranslater{
-				Result:         0,
-				ExpectedReturn: "off"},
-			StatusTranslater{
-				Result:         1,
-				ExpectedReturn: "on"}}}
+	sc["power"] = StatusCommand{
+		ResultByte:  -1,
+		Translaters: map[byte]string{0: "off", 1: "on"},
+	}
 	return sc
 }
 
 func (p *Power) Status(Command string) (string, error) {
-	result, err := p.StatusCommands[Command].RunStatusCommand(p.APIRequester)
+	result, err := p.StatusCommands[Command].RunStatusCommand("bacpac/se", p.APIRequester)
 	if err != nil {
 		return "", err
 	}
