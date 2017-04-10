@@ -1,6 +1,9 @@
 package gogopro
 
-import ()
+import (
+	"errors"
+	"fmt"
+)
 
 type Power struct {
 	APIRequester   *APIRequester
@@ -28,8 +31,12 @@ func CreatePowerStatusCommands() map[string]StatusCommand {
 	return sc
 }
 
-func (p *Power) Status(Command string) (string, error) {
-	result, err := p.StatusCommands[Command].RunStatusCommand("bacpac/se", p.APIRequester)
+func (p *Power) Status(command string) (string, error) {
+	pCmd, ok := p.StatusCommands[command]
+	if ok == false {
+		return "", errors.New(fmt.Sprintf("No power status command %s", command))
+	}
+	result, err := pCmd.RunStatusCommand("/bacpac/se", p.APIRequester)
 	if err != nil {
 		return "", err
 	}

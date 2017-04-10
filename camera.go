@@ -1,6 +1,9 @@
 package gogopro
 
-import ()
+import (
+	"errors"
+	"fmt"
+)
 
 type Camera struct {
 	APIRequester   *APIRequester
@@ -116,8 +119,12 @@ func CreateCameraStatusCommands() map[string]StatusCommand {
 	*/
 	return sc
 }
-func (c *Camera) Status(Command string) (string, error) {
-	result, err := c.StatusCommands[Command].RunStatusCommand("/camera/sx", c.APIRequester)
+func (c *Camera) Status(command string) (string, error) {
+	sCmd, ok := c.StatusCommands[command]
+	if ok == false {
+		return "", errors.New(fmt.Sprintf("No camera status command %s", command))
+	}
+	result, err := sCmd.RunStatusCommand("/camera/sx", c.APIRequester)
 	if err != nil {
 		return "", err
 	}
