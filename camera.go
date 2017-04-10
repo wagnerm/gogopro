@@ -1,6 +1,9 @@
 package gogopro
 
-import ()
+import (
+	"errors"
+	"fmt"
+)
 
 type Camera struct {
 	APIRequester   *APIRequester
@@ -10,7 +13,6 @@ type Camera struct {
 func (c *Camera) Init() *Camera {
 	return c
 }
-
 func CreateCamera(APIRequester *APIRequester) *Camera {
 	camera := &Camera{}
 	camera.APIRequester = APIRequester
@@ -22,223 +24,107 @@ func CreateCamera(APIRequester *APIRequester) *Camera {
 func CreateCameraStatusCommands() map[string]StatusCommand {
 	sc := make(map[string]StatusCommand)
 	sc["mode"] = StatusCommand{
-		Endpoint:   "/camera/sx",
-		ResultByte: 1,
-		Translaters: []StatusTranslater{
-			StatusTranslater{
-				Result:         0,
-				ExpectedReturn: "video"},
-			StatusTranslater{
-				Result:         1,
-				ExpectedReturn: "photo"},
-			StatusTranslater{
-				Result:         2,
-				ExpectedReturn: "burst"},
-			StatusTranslater{
-				Result:         3,
-				ExpectedReturn: "timelapse"}}}
+		ResultByte:  1,
+		Translaters: map[byte]string{0: "video", 1: "photo", 2: "burst", 3: "timelapse"},
+	}
 	sc["defaultmode"] = StatusCommand{
-		Endpoint:   "/camera/sx",
-		ResultByte: 3,
-		Translaters: []StatusTranslater{
-			StatusTranslater{
-				Result:         0,
-				ExpectedReturn: "video"},
-			StatusTranslater{
-				Result:         1,
-				ExpectedReturn: "photo"},
-			StatusTranslater{
-				Result:         2,
-				ExpectedReturn: "burst"},
-			StatusTranslater{
-				Result:         3,
-				ExpectedReturn: "timelapse"}}}
+		ResultByte:  3,
+		Translaters: map[byte]string{0: "video", 1: "photo", 2: "burst", 3: "timelapse"},
+	}
 	sc["spotmeter"] = StatusCommand{
-		Endpoint:   "/camera/sx",
-		ResultByte: 4,
-		Translaters: []StatusTranslater{
-			StatusTranslater{
-				Result:         0,
-				ExpectedReturn: "off"},
-			StatusTranslater{
-				Result:         1,
-				ExpectedReturn: "on"}}}
+		ResultByte:  4,
+		Translaters: map[byte]string{0: "off", 1: "on"},
+	}
 	sc["timelapse_interval"] = StatusCommand{
-		Endpoint:   "/camera/sx",
-		ResultByte: 5,
-		Translaters: []StatusTranslater{
-			StatusTranslater{
-				Result:         0,
-				ExpectedReturn: "0.5s"},
-			StatusTranslater{
-				Result:         1,
-				ExpectedReturn: "1s"},
-			StatusTranslater{
-				Result:         2,
-				ExpectedReturn: "2s"},
-			StatusTranslater{
-				Result:         5,
-				ExpectedReturn: "5s"},
-			StatusTranslater{
-				Result:         10,
-				ExpectedReturn: "10s"},
-			StatusTranslater{
-				Result:         40,
-				ExpectedReturn: "30s"},
-			StatusTranslater{
-				Result:         60,
-				ExpectedReturn: "60s"}}}
+		ResultByte:  5,
+		Translaters: map[byte]string{0: "0.5s", 1: "1s", 2: "2s", 5: "5s", 10: "10s", 40: "30s", 60: "60s"},
+	}
 	sc["fov"] = StatusCommand{
-		Endpoint:   "/camera/sx",
-		ResultByte: 7,
-		Translaters: []StatusTranslater{
-			StatusTranslater{
-				Result:         0,
-				ExpectedReturn: "wide"},
-			StatusTranslater{
-				Result:         1,
-				ExpectedReturn: "medium"},
-			StatusTranslater{
-				Result:         2,
-				ExpectedReturn: "narrow"}}}
+		ResultByte:  7,
+		Translaters: map[byte]string{0: "wide", 1: "medium", 2: "narrow"},
+	}
 	sc["photores"] = StatusCommand{
-		Endpoint:   "/camera/sx",
-		ResultByte: 8,
-		Translaters: []StatusTranslater{
-			StatusTranslater{
-				Result:         3,
-				ExpectedReturn: "5MP_med"},
-			StatusTranslater{
-				Result:         4,
-				ExpectedReturn: "7MP_wide"},
-			StatusTranslater{
-				Result:         8,
-				ExpectedReturn: "10MP_wide"}}}
+		ResultByte:  8,
+		Translaters: map[byte]string{3: "5MP_med", 4: "7MP_wide", 8: "10MP_wide"},
+	}
+	/* TODO nil translaters
 	sc["minselapsed"] = StatusCommand{
-		Endpoint:    "/camera/sx",
 		ResultByte:  13,
-		Translaters: nil}
+		Translaters: nil,
+	}
 	sc["secselapsed"] = StatusCommand{
-		Endpoint:    "/camera/sx",
 		ResultByte:  14,
-		Translaters: nil}
+		Translaters: nil,
+	}
+	*/
 	sc["volume"] = StatusCommand{
-		Endpoint:   "/camera/sx",
-		ResultByte: 16,
-		Translaters: []StatusTranslater{
-			StatusTranslater{
-				Result:         0,
-				ExpectedReturn: "off"},
-			StatusTranslater{
-				Result:         1,
-				ExpectedReturn: "70%"},
-			StatusTranslater{
-				Result:         2,
-				ExpectedReturn: "100%"}}}
+		ResultByte:  16,
+		Translaters: map[byte]string{0: "off", 1: "70%", 2: "100%"},
+	}
 	sc["led"] = StatusCommand{
-		Endpoint:   "/camera/sx",
-		ResultByte: 17,
-		Translaters: []StatusTranslater{
-			StatusTranslater{
-				Result:         0,
-				ExpectedReturn: "off"},
-			StatusTranslater{
-				Result:         1,
-				ExpectedReturn: "led2"},
-			StatusTranslater{
-				Result:         2,
-				ExpectedReturn: "led4"}}}
-
-	/* TODO: Photo/video counts for two bytes? */
-	sc["photoremaining"] = StatusCommand{
-		Endpoint:    "/camera/sx",
-		ResultByte:  21,
-		Translaters: nil}
-	sc["photocount"] = StatusCommand{
-		Endpoint:    "/camera/sx",
-		ResultByte:  23,
-		Translaters: nil}
-	sc["videoremaining"] = StatusCommand{
-		Endpoint:    "/camera/sx",
-		ResultByte:  25,
-		Translaters: nil}
-	sc["videocount"] = StatusCommand{
-		Endpoint:    "/camera/sx",
-		ResultByte:  25,
-		Translaters: nil}
-
-	sc["recording"] = StatusCommand{
-		Endpoint:   "/camera/sx",
-		ResultByte: 29,
-		Translaters: []StatusTranslater{
-			StatusTranslater{
-				Result:         0,
-				ExpectedReturn: "off"},
-			StatusTranslater{
-				Result:         1,
-				ExpectedReturn: "on"}}}
-	sc["videoresolution"] = StatusCommand{
-		Endpoint:   "/camera/sx",
-		ResultByte: 50,
-		Translaters: []StatusTranslater{
-			StatusTranslater{
-				Result:         0,
-				ExpectedReturn: "WVGA"},
-			StatusTranslater{
-				Result:         1,
-				ExpectedReturn: "720"},
-			StatusTranslater{
-				Result:         2,
-				ExpectedReturn: "960"},
-			StatusTranslater{
-				Result:         3,
-				ExpectedReturn: "1080"}}}
-	sc["fps"] = StatusCommand{
-		Endpoint:   "/camera/sx",
-		ResultByte: 51,
-		Translaters: []StatusTranslater{
-			StatusTranslater{
-				Result:         3,
-				ExpectedReturn: "25"},
-			StatusTranslater{
-				Result:         6,
-				ExpectedReturn: "50"}}}
-
-	/*
+		ResultByte:  17,
+		Translaters: map[byte]string{0: "off", 1: "led2", 2: "led4"},
+	}
+	/* TODO: Photo/video counts for two bytes?
+		sc["photoremaining"] = StatusCommand{
+			ResultByte:  21,
+			Translaters: nil}
+		sc["photocount"] = StatusCommand{
+			ResultByte:  23,
+			Translaters: nil}
+		sc["videoremaining"] = StatusCommand{
+			ResultByte:  25,
+			Translaters: nil}
+		sc["videocount"] = StatusCommand{
+			ResultByte:  25,
+			Translaters: nil}
+		sc["recording"] = StatusCommand{
+			ResultByte: 29,
+			Translaters: map[byte]string{0:"off", 1:"on"},
+	    }
+		sc["videoresolution"] = StatusCommand{
+			ResultByte: 50,
+			Translaters: map[byte]string{0:"WVGA", 1:"720", 2:"960", 3:"1080"},
+		}
+		sc["fps"] = StatusCommand{
+			ResultByte: 51,
+			Translaters: map[byte]string{3:"25", 6:"50"},
+		}
 		/*
-			TODO: Need support for checking bits
-			sc["orientation"] = StatusCommand{
-				Endpoint:   "/camera/sx",
-				ResultByte: 18,
-				Translaters: []StatusTranslater{
-					StatusTranslater{
-						Result:         0,
-						ExpectedReturn: "up"},
-					StatusTranslater{
-						Result:         4,
-						ExpectedReturn: "down"}}}
-			sc["iso_sharpness"] = StatusCommand{
-					Endpoint:   "/camera/sx",
-					ResultByte: 6,
-					Translaters: []StatusTranslater{
+			/*
+				TODO: Need support for checking bits
+				sc["orientation"] = StatusCommand{
+					ResultByte: 18,
+					Translaters: map[byte]string{
 						StatusTranslater{
 							Result:         0,
-							ExpectedReturn: "off"},
+							ExpectedReturn: "up"},
 						StatusTranslater{
-							Result:         1,
-							ExpectedReturn: "on"}}}
-
-			TODO: Byte 30
-			====
-			Protune
-			Low light
-			Color
+							Result:         4,
+							ExpectedReturn: "down"}}}
+				sc["iso_sharpness"] = StatusCommand{
+						ResultByte: 6,
+						Translaters: map[byte]string{
+							StatusTranslater{
+								Result:         0,
+								ExpectedReturn: "off"},
+							StatusTranslater{
+								Result:         1,
+								ExpectedReturn: "on"}}}
+				TODO: Byte 30
+				====
+				Protune
+				Low light
+				Color
 	*/
 	return sc
 }
-
-func (c *Camera) Status(Command string) (string, error) {
-	result, err := c.StatusCommands[Command].RunStatusCommand(c.APIRequester)
+func (c *Camera) Status(command string) (string, error) {
+	sCmd, ok := c.StatusCommands[command]
+	if ok == false {
+		return "", errors.New(fmt.Sprintf("No camera status command %s", command))
+	}
+	result, err := sCmd.RunStatusCommand("/camera/sx", c.APIRequester)
 	if err != nil {
 		return "", err
 	}

@@ -4,50 +4,37 @@ import (
 	"testing"
 )
 
-func NewStatusCommand(ResultByte int) *StatusCommand {
-	return &StatusCommand{
-		Endpoint:    "",
-		ResultByte:  ResultByte,
-		Translaters: NewStatusTranslaters(),
-	}
-}
-
-func NewStatusTranslaters() []StatusTranslater {
-	t := []StatusTranslater{
-		StatusTranslater{
-			Result:         0,
-			ExpectedReturn: "low"},
-		StatusTranslater{
-			Result:         1,
-			ExpectedReturn: "med"},
-		StatusTranslater{
-			Result:         2,
-			ExpectedReturn: "high"},
-	}
-	return t
-}
-
-func RunEvalTranslater(ResultByte int, Results []byte) (string, error) {
-	s := NewStatusCommand(ResultByte)
-	return s.EvalTranslater(Results)
-}
-
 func TestEvalTranslator(t *testing.T) {
-	if r, err := RunEvalTranslater(0, []byte{0, 1, 2}); err != nil {
-		t.Error(err)
-	} else if r != "low" {
-		t.Errorf("Expected low, got %s", r)
+	s := StatusCommand{
+		ResultByte:  1,
+		Translaters: map[byte]string{0: "video", 1: "photo"},
 	}
-
-	if r, err := RunEvalTranslater(1, []byte{0, 1, 2}); err != nil {
-		t.Error(err)
-	} else if r != "med" {
-		t.Errorf("Expected med, got %s", r)
+	expected := s.Translaters[1]
+	r, _ := s.EvalTranslater([]byte{0, 1, 2})
+	if r != expected {
+		t.Errorf("Expected %s, got %s", expected, r)
 	}
+}
 
-	if r, err := RunEvalTranslater(2, []byte{0, 1, 2}); err != nil {
-		t.Error(err)
-	} else if r != "high" {
-		t.Errorf("Expected high, got %s", r)
+func TestNoMatchEvalTranslaters(t *testing.T) {
+	s := StatusCommand{
+		ResultByte:  0,
+		Translaters: map[byte]string{},
+	}
+	r, _ := s.EvalTranslater([]byte{0})
+	if r != "" {
+		t.Errorf("Expected empty result, got %s", r)
+	}
+}
+
+func TestEvalTranslaterLastValue(t *testing.T) {
+	s := StatusCommand{
+		ResultByte:  -1,
+		Translaters: map[byte]string{0: "no", 1: "yes"},
+	}
+	expected := s.Translaters[0]
+	r, _ := s.EvalTranslater([]byte{0, 3, 1, 2, 3, 1, 0})
+	if r != expected {
+		t.Errorf("Expected %s , got %s", expected, r)
 	}
 }
